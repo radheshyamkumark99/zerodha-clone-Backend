@@ -21,9 +21,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://zerodha-clone-dashboard-rho.vercel.app/"],// frontend & dashboard
+    origin: ["http://localhost:3000", "https://zerodha-clone-dashboard-rho.vercel.app"],// frontend & dashboard
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
   }),
 );
 
