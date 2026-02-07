@@ -21,7 +21,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://zerodha-clone-dashboard-rho.vercel.app", "http://localhost:3000",],// frontend & dashboard
+    origin: [
+      "https://zerodha-clone-dashboard-rho.vercel.app",
+      "http://localhost:3000",
+    ], // frontend & dashboard
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),
@@ -31,12 +34,6 @@ app.use(bodyparser.json());
 app.use(cookieParser());
 app.use(express.json());
 app.use("/", AuthRoute);
-
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,        //  Render + Vercel ke liye MUST
-  sameSite: "none",    //  Cross-site cookie ke liye MUST
-});
 
 // app.get("/addholdings", async (req, res) => {
 //   let tempholdings = [
@@ -315,6 +312,36 @@ app.post("/signup", async (req, res) => {
   await User.create({ email, password, username });
 
   res.json({ success: true, message: "Signup successful" });
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    return res.json({ success: false, message: "User not found" });
+  }
+
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    return res.json({ success: false, message: "Invalid credentials" });
+  }
+
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
+
+  // 🔥 YAHI PE LIKHNA HAI
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: true, // Render + Vercel
+    sameSite: "none", // Cross-site
+  });
+
+  res.json({
+    success: true,
+    message: "Login successful",
+  });
 });
 
 //   const newUser = new UserModel({
