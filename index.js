@@ -21,10 +21,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "https://zerodha-clone-dashboard-rho.vercel.app",
-      "http://localhost:3000",
-    ], // frontend & dashboard
+    origin: ["http://localhost:3000", "https://zerodha-clone-dashboard-rho.vercel.app"],// frontend & dashboard
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),
@@ -312,36 +309,6 @@ app.post("/signup", async (req, res) => {
   await User.create({ email, password, username });
 
   res.json({ success: true, message: "Signup successful" });
-});
-
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  const user = await UserModel.findOne({ email });
-  if (!user) {
-    return res.json({ success: false, message: "User not found" });
-  }
-
-  const isMatch = await user.comparePassword(password);
-  if (!isMatch) {
-    return res.json({ success: false, message: "Invalid credentials" });
-  }
-
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
-  });
-
-  // 🔥 YAHI PE LIKHNA HAI
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: true, // Render + Vercel
-    sameSite: "none", // Cross-site
-  });
-
-  res.json({
-    success: true,
-    message: "Login successful",
-  });
 });
 
 //   const newUser = new UserModel({
