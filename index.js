@@ -21,8 +21,9 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://zerodha-clone-dashboard-rho.vercel.app"],// frontend & dashboard
+    origin: ["https://zerodha-clone-dashboard-rho.vercel.app", "http://localhost:3000",],// frontend & dashboard
     methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   }),
 );
 
@@ -30,6 +31,12 @@ app.use(bodyparser.json());
 app.use(cookieParser());
 app.use(express.json());
 app.use("/", AuthRoute);
+
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,        //  Render + Vercel ke liye MUST
+  sameSite: "none",    //  Cross-site cookie ke liye MUST
+});
 
 // app.get("/addholdings", async (req, res) => {
 //   let tempholdings = [
